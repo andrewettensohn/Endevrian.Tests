@@ -17,7 +17,7 @@ namespace Endevrian.Tests
             string field = "HistoricalLogCount";
 
             // Act
-            string result = QueryHelper.RunQuery(query, field);
+            string result = QueryHelper.SelectQuery(query, field);
             bool tryParseResult = int.TryParse(result, out int logCount);
 
             // Assert
@@ -34,7 +34,7 @@ namespace Endevrian.Tests
             string field = "AdventureLogID";
 
             // Act
-            string result = QueryHelper.RunQuery(query, field);
+            string result = QueryHelper.SelectQuery(query, field);
             string expectedResult = "No Results";
 
             // Assert

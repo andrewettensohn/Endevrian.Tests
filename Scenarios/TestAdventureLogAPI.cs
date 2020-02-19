@@ -83,14 +83,14 @@ namespace Endevrian.Tests
         {
             //Arrange
             var client = _factory.CreateClient();
-            string qryResultBeforeDelete = QueryHelper.RunQuery("SELECT TOP 1 AdventureLogID FROM AdventureLogs", "AdventureLogID");
+            string qryResultBeforeDelete = QueryHelper.SelectQuery("SELECT TOP 1 AdventureLogID FROM AdventureLogs", "AdventureLogID");
             int adventureLogID = int.Parse(qryResultBeforeDelete);
 
             // Act
             await client.DeleteAsync(url + "/" + adventureLogID);
 
             // Assert
-            string qryResultAfterDelete = QueryHelper.RunQuery($"SELECT TOP 1 AdventureLogID FROM AdventureLogs WHERE AdventureLogID = {adventureLogID}", "AdventureLogID");
+            string qryResultAfterDelete = QueryHelper.SelectQuery($"SELECT TOP 1 AdventureLogID FROM AdventureLogs WHERE AdventureLogID = {adventureLogID}", "AdventureLogID");
             Assert.NotStrictEqual(qryResultBeforeDelete, qryResultAfterDelete);
 
         }
