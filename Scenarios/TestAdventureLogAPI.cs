@@ -33,7 +33,7 @@ namespace Endevrian.Tests
 
             var itemToSend = new AdventureLog
             {
-                UserID = null,
+                UserId = null,
                 LogTitle = "Session 22: More Stuff",
                 LogBody = "<p><b>The elf jumped over the lazy dwarf.</b></p>"
             };
@@ -48,10 +48,14 @@ namespace Endevrian.Tests
             string afterLogCountQueryResult = _queryHelper.SelectQuery("SELECT TOP 1 HistoricalLogCount FROM HistoricalAdventureLogCounts", "HistoricalLogCount");
             int afterLogCount = int.Parse(afterLogCountQueryResult);
 
+            string createdLogTitleQueryResult = _queryHelper.SelectQuery($"SELECT LogTitle FROM AdventureLogs WHERE AdventureLogID = {afterLogCount}", "LogTitle");
+            string createdLogBodyQueryResult = _queryHelper.SelectQuery($"SELECT LogBody FROM AdventureLogs WHERE AdventureLogID = {afterLogCount}", "LogBody");
+
             // Assert
             send.EnsureSuccessStatusCode(); // Status Code 200-299
             Assert.Equal("application/json; charset=utf-8", send.Content.Headers.ContentType.ToString());
-
+            Assert.Equal(itemToSend.LogTitle, createdLogTitleQueryResult);
+            Assert.Equal(itemToSend.LogBody, createdLogBodyQueryResult);
             Assert.NotEqual(beforeLogCount, afterLogCount);
 
         }
@@ -62,7 +66,7 @@ namespace Endevrian.Tests
         {
             //Arrange
             var client = _factory.CreateClient();
-            string adventureLog = _queryHelper.SelectQuery("SELECT TOP 1 AdventureLogID FROM AdventureLogs ORDER BY AdventureLogID DESC", "AdventureLogID");
+            //string adventureLog = _queryHelper.SelectQuery("SELECT TOP 1 AdventureLogID FROM AdventureLogs ORDER BY AdventureLogID DESC", "AdventureLogID");
 
             // Act
             var response = await client.GetAsync(url);
@@ -73,21 +77,33 @@ namespace Endevrian.Tests
 
         }
 
-        //[Theory]
-        //[InlineData("/Home/api/AdventureLogs")]
-        //public async Task GetAdventureLogTest(string url)
-        //{
-        //    //Arrange
-        //    var client = _factory.CreateClient();
+        [Theory]
+        [InlineData("/Home/api/AdventureLogs")]
+        public async Task PutAdventureLogTest(string url)
+        {
+            //Arrange
+            var client = _factory.CreateClient();
+            string adventureLogIdResult = _queryHelper.SelectQuery("SELECT TOP 1 AdventureLogID FROM AdventureLogs ORDER BY AdventureLogID DESC", "AdventureLogID");
+            int adventureLogId = int.Parse(adventureLogIdResult);
+            var itemToSend = new AdventureLog
+            {
+                AdventureLogID = adventureLogId,
+                UserId = null,
+                LogTitle = "Session 23: I changed my mind",
+                LogBody = "<p><b>The dwarf punched the stupid elf.</b></p>"
+            };
+            var sentContent = JsonConvert.SerializeObject(itemToSend);
 
-        //    // Act
-        //    var response = await client.GetAsync(url + "/" + expectedLogID);
+            // Act
+            await client.PutAsync(url, new StringContent(sentContent, Encoding.UTF8, "application/json"));
 
-        //    // Assert
-        //    response.EnsureSuccessStatusCode(); // Status Code 200-299
-        //    Assert.Equal("application/json; charset=utf-8", response.Content.Headers.ContentType.ToString());
+            AdventureLog adventureLog = _queryHelper.SelectAdventureLogQuery(adventureLogId);
 
-        //}
+            // Assert
+            Assert.Equal(itemToSend.LogTitle, adventureLog.LogTitle);
+            Assert.Equal(itemToSend.LogBody, adventureLog.LogBody);
+
+        }
 
         [Theory]
         [InlineData("/Home/api/AdventureLogs")]

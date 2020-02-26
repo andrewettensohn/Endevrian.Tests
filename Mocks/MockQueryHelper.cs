@@ -1,4 +1,5 @@
 ﻿using Endevrian.Controllers;
+using Endevrian.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -53,13 +54,52 @@ namespace Endevrian.Data
             return result;
         }
 
+        public AdventureLog SelectAdventureLogQuery(int id)
+        {
+
+            string query = $"SELECT * FROM AdventureLogs WHERE AdventureLogID = {id}";
+            AdventureLog adventureLog = new AdventureLog();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                try
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.HasRows)
+                        {
+                            adventureLog = new AdventureLog()
+                            {
+                                AdventureLogID = id,
+                                UserId = reader["UserId"].ToString(),
+                                LogTitle = reader["LogTitle"].ToString(),
+                                LogBody = reader["LogBody"].ToString(),
+                                LogDate = DateTime.Parse(reader["LogDate"].ToString())
+                            };
+                        }                        
+                    }
+                }
+                catch (Exception exc)
+                {
+                    //_logger.AddSystemLog($"Failed to read query results: {exc}");
+                }
+
+                return adventureLog;
+            }
+        }
+
         public void UpdateQuery(string query)
         {
 
-            using SqlConnection connection = new SqlConnection(_connectionString);
-            SqlCommand command = new SqlCommand(query, connection);
-            connection.Open();
-            connection.Dispose();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
 
             return;
         }

@@ -1,5 +1,6 @@
 ﻿using Endevrian.Controllers;
 using Endevrian.Data;
+using Endevrian.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -71,5 +72,20 @@ namespace Endevrian.Tests
             Assert.NotEqual(logCountBefore, logCountAfter);
 
         }
+
+        //[Fact]
+        //public void RunQueryAdventureLogTest()
+        //{
+        //    // Arrange
+        //    string logCountResult = _queryHelper.SelectQuery("SELECT HistoricalLogCount FROM HistoricalAdventureLogCounts", "HistoricalLogCount");
+        //    int logCount = int.Parse(logCountResult);
+
+        //    // Act
+        //    AdventureLog adventureLog = _queryHelper.SelectAdventureLogQuery(logCount);
+
+        //    // Assert
+        //    Assert.NotNull(adventureLog.LogTitle);
+
+        //}
     }
 }
